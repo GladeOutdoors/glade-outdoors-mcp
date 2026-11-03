@@ -18,6 +18,19 @@ Visit [getglade.co.uk/developers](https://getglade.co.uk/developers) and fill in
 
 ### 2. Add to your client
 
+**Claude Code (plugin — recommended)** — installs the MCP server plus the Glade [skill](#agent-skill), and prompts for your key (stored in your OS keychain):
+
+```
+/plugin install glade --marketplace jamesmorgan/glade-agent-api
+```
+
+**Claude Code (server only):**
+
+```bash
+claude mcp add --transport http glade https://getglade.co.uk/api/mcp \
+  --header "Authorization: Bearer glade_YOUR_KEY_HERE"
+```
+
 **Claude Desktop** — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
@@ -56,26 +69,68 @@ Visit [getglade.co.uk/developers](https://getglade.co.uk/developers) and fill in
 
 ---
 
+## Agent skill
+
+[`skills/glade/SKILL.md`](https://github.com/jamesmorgan/glade-agent-api/blob/main/skills/glade/SKILL.md) teaches an agent when to reach for Glade and how to use it well: turning "woods near Leeds with a café" into the right filters, searching before fetching detail to save credits, and recovering when a place isn't found. It follows the open [Agent Skills](https://agentskills.io) format, so it works in Claude Code, Codex, Cursor, Gemini CLI and other compatible agents:
+
+```bash
+npx skills add jamesmorgan/glade-agent-api
+```
+
+The Claude Code plugin above includes it automatically.
+
+---
+
 ## Tools
 
 ### `search_locations`
 
-Search for outdoor locations near a UK postcode or coordinates.
+Search for outdoor locations near a UK place name, postcode, or coordinates. Supports filtering by activity, location type, and facilities.
 
 **Cost:** 1 credit per call
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `postcode` | string | one of postcode or lat+lng | UK postcode e.g. `"WA14 4SA"` |
-| `lat` | number | one of postcode or lat+lng | Decimal latitude |
-| `lng` | number | one of postcode or lat+lng | Decimal longitude |
+| `place` | string | one of place, postcode, or lat+lng | UK place name e.g. `"Manchester"`, `"Leeds"`, `"Lake District"`. **Preferred for city/town searches.** |
+| `postcode` | string | one of place, postcode, or lat+lng | UK postcode e.g. `"WA14 4SA"`, `"M1 1AA"` |
+| `lat` | number | one of place, postcode, or lat+lng | Decimal latitude |
+| `lng` | number | one of place, postcode, or lat+lng | Decimal longitude |
 | `activity` | string | no | Activity slug — see [activity slugs](#activity-slugs) |
+| `location_types` | array | no | Filter by location type — see [location types](#location-types) |
+| `facilities` | array | no | Filter by required facilities — see [facilities](#facilities) |
 | `radius_km` | number | no | Search radius in km. Default `20`, max `50` |
 | `limit` | integer | no | Number of results. Default `10`, max `25` |
 
-**Example prompt:** *"Find places for a dog walk near WA14 4SA"*
+**Example prompts:**
+- *"Find places for a dog walk near WA14 4SA"*
+- *"Woodlands near Manchester"* → `place: "Manchester"`, `activity: "forest-walks"`
+- *"Park with cafe in Leeds"* → `place: "Leeds"`, `location_types: ["urban_park", "country_park"]`, `facilities: ["cafe"]`
+- *"Nature reserve with toilets near Nottingham"* → `place: "Nottingham"`, `location_types: ["nature_reserve"]`, `facilities: ["toilets"]`
 
-**Example result (one location):**
+**Response shape:**
+```json
+{
+  "locations": [...],
+  "total": 10,
+  "resolved_place": "manchester",
+  "explore_url": "/explore?lat=53.48&lng=-2.24&activity=forest-walks"
+}
+```
+
+When no results are found (empty or place not recognized):
+```json
+{
+  "locations": [],
+  "total": 0,
+  "status": "place_not_found",
+  "message": "Could not find \"South Manchester\". Try a major city name, town, or UK postcode.",
+  "explore_url": "/explore?lat=53.48&lng=-2.24"
+}
+```
+
+**Note:** The `explore_url` can be appended to `https://getglade.co.uk` to link users to the Explore map with the same search.
+
+**Example location in results:**
 ```json
 {
   "id": "3036a816-038f-46f1-8396-af7e6eb5d3bb",
@@ -147,12 +202,34 @@ Fetch full detail for a specific location by ID, including activities, trails, f
 
 | Tier | Per minute | Per day |
 |---|---|---|
-| Free | 10 credits | 100 credits |
+| Free | 10 credits | 200 credits |
 | Standard | 60 credits | 5,000 credits |
 
-When a limit is exceeded the server returns HTTP `429` with a `Retry-After` header (seconds until the window resets).
+When a limit is exceeded the server returns HTTP `429` with a `Retry-After` header (seconds until the window resets — daily quotas reset at 00:00 UTC).
 
 Credit costs: `search_locations` = 1 credit, `get_location_detail` = 3 credits.
+
+---
+
+## Facilities
+
+Pass these as the `facilities` array parameter to filter results to locations with specific amenities:
+
+| Value | Description |
+|---|---|
+| `car_park` | Has parking |
+| `toilets` | Has toilets |
+| `cafe` | Has a café |
+| `playground` | Has a playground |
+| `picnic_area` | Has picnic facilities |
+| `visitor_centre` | Has a visitor centre |
+| `campsite` | Has camping facilities |
+| `cycle_hire` | Offers cycle hire |
+| `walking_trails` | Has marked walking trails |
+| `cycling_trails` | Has cycling trails |
+| `horse_riding` | Allows horse riding |
+
+**Example:** To find parks with a café and toilets: `facilities: ["cafe", "toilets"]`
 
 ---
 
@@ -162,19 +239,22 @@ Pass these as the `activity` parameter to filter results:
 
 | Slug | Activity |
 |---|---|
-| `walking` | Walking |
+| `forest-walks` | Forest walks / woodland walks |
 | `dog-walks` | Dog walks |
+| `family-friendly` | Family friendly |
+| `hiking` | Hiking |
+| `bird-watching` | Bird watching |
+| `wildlife` | Wildlife watching |
+| `heritage` | Heritage / historic sites |
 | `cycling` | Cycling |
 | `mountain-biking` | Mountain biking |
 | `running` | Running / trail running |
-| `bird-watching` | Bird watching |
 | `wild-swimming` | Wild swimming |
+| `easy-access` | Easy access / accessible |
 | `fishing` | Fishing |
 | `horse-riding` | Horse riding |
-| `rock-climbing` | Rock climbing |
-| `orienteering` | Orienteering |
-| `nature-study` | Nature study |
 | `foraging` | Foraging |
+| `mushroom-foraging` | Mushroom foraging |
 | `photography` | Photography |
 
 ---
@@ -258,12 +338,51 @@ Authenticate with an `Authorization: Bearer glade_YOUR_KEY` header, or pay per-c
 GET https://getglade.co.uk/api/v1/locations/search
 ```
 
-Query parameters match `search_locations` tool arguments.
+Query parameters match `search_locations` tool arguments:
+
+| Parameter | Type | Description |
+|---|---|---|
+| `place` | string | UK place name (preferred for city/town searches) |
+| `postcode` | string | UK postcode |
+| `lat` | number | Decimal latitude |
+| `lng` | number | Decimal longitude |
+| `activity` | string | Activity slug |
+| `location_types` | string | Location type(s) — repeat param or comma-separated |
+| `facilities` | string | Required facility(s) — repeat param or comma-separated |
+| `radius_km` | number | Search radius in km (default 20, max 50) |
+| `limit` | integer | Number of results (default 10, max 25) |
+
+**Examples:**
 
 ```bash
+# Search by postcode
 curl "https://getglade.co.uk/api/v1/locations/search?postcode=WA14+4SA&activity=dog-walks&limit=5" \
   -H "Authorization: Bearer glade_YOUR_KEY"
+
+# Search by place name
+curl "https://getglade.co.uk/api/v1/locations/search?place=Manchester&activity=forest-walks" \
+  -H "Authorization: Bearer glade_YOUR_KEY"
+
+# Search with location type filter (woodland near Leeds)
+curl "https://getglade.co.uk/api/v1/locations/search?place=Leeds&location_types=broadleaved,conifer,mixed" \
+  -H "Authorization: Bearer glade_YOUR_KEY"
+
+# Search with facility filter (park with cafe)
+curl "https://getglade.co.uk/api/v1/locations/search?place=Wakefield&location_types=urban_park,country_park&facilities=cafe" \
+  -H "Authorization: Bearer glade_YOUR_KEY"
 ```
+
+**Response:**
+```json
+{
+  "locations": [...],
+  "total": 10,
+  "resolved_place": "manchester",
+  "explore_url": "/explore?lat=53.48&lng=-2.24&activity=forest-walks"
+}
+```
+
+**Note:** The phrase→filter lexicon (e.g. "woodlands" → `forest-walks` activity only) is **chat-only**. API callers should send structured `activity`, `location_types`, and `facilities` parameters directly. "Near me" geolocation is also chat-only — API callers should pass explicit `lat`/`lng` coordinates.
 
 ### Detail
 
