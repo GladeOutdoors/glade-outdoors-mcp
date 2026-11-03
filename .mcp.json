@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "glade": {
+      "type": "http",
+      "url": "https://getglade.co.uk/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${user_config.api_key}"
+      }
+    }
+  }
+}

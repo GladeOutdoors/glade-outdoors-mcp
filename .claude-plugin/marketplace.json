@@ -1,0 +1,15 @@
+{
+  "name": "glade",
+  "description": "Glade — UK outdoor places for AI agents: MCP server plus skill.",
+  "owner": {
+    "name": "Glade",
+    "email": "hello@getglade.co.uk"
+  },
+  "plugins": [
+    {
+      "name": "glade",
+      "source": "./",
+      "description": "Find woodland, nature reserves, parks and trails across England, Scotland and Wales."
+    }
+  ]
+}

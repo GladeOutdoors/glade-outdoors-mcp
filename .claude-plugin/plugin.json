@@ -1,0 +1,39 @@
+{
+  "name": "glade",
+  "displayName": "Glade — UK outdoor places",
+  "version": "1.0.0",
+  "description": "Find woodland, nature reserves, parks and trails across England, Scotland and Wales. Bundles the Glade MCP server with a skill that teaches the agent when and how to search.",
+  "author": {
+    "name": "Glade",
+    "email": "hello@getglade.co.uk",
+    "url": "https://getglade.co.uk"
+  },
+  "homepage": "https://getglade.co.uk/developers",
+  "repository": "https://github.com/GladeOutdoors/glade-outdoors-mcp",
+  "license": "MIT",
+  "keywords": [
+    "uk",
+    "outdoors",
+    "woodland",
+    "nature-reserves",
+    "parks",
+    "walking",
+    "hiking",
+    "maps",
+    "mcp"
+  ],
+  "icon": "./.claude-plugin/icon.png",
+  "documentationUrl": "https://github.com/GladeOutdoors/glade-outdoors-mcp#readme",
+  "supportUrl": "https://getglade.co.uk/contact",
+  "privacyPolicyUrl": "https://getglade.co.uk/privacy",
+  "termsOfServiceUrl": "https://getglade.co.uk/terms",
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "Glade API key",
+      "description": "Your glade_… API key. Request a free key at https://getglade.co.uk/developers",
+      "required": true,
+      "sensitive": true
+    }
+  }
+}
