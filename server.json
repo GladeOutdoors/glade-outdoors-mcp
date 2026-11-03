@@ -6,7 +6,7 @@
   "version": "1.0.0",
   "websiteUrl": "https://getglade.co.uk/developers",
   "repository": {
-    "url": "https://github.com/GladeOutdoors/glade-agent-api",
+    "url": "https://github.com/GladeOutdoors/glade-outdoors-mcp",
     "source": "github"
   },
   "remotes": [

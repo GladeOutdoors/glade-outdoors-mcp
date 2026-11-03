@@ -9,7 +9,7 @@
     "url": "https://getglade.co.uk"
   },
   "homepage": "https://getglade.co.uk/developers",
-  "repository": "https://github.com/GladeOutdoors/glade-agent-api",
+  "repository": "https://github.com/GladeOutdoors/glade-outdoors-mcp",
   "license": "MIT",
   "keywords": [
     "uk",
@@ -23,7 +23,7 @@
     "mcp"
   ],
   "icon": "./.claude-plugin/icon.png",
-  "documentationUrl": "https://github.com/GladeOutdoors/glade-agent-api#readme",
+  "documentationUrl": "https://github.com/GladeOutdoors/glade-outdoors-mcp#readme",
   "supportUrl": "https://getglade.co.uk/contact",
   "privacyPolicyUrl": "https://getglade.co.uk/privacy",
   "termsOfServiceUrl": "https://getglade.co.uk/terms",

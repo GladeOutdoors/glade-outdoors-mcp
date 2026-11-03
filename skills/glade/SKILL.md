@@ -95,7 +95,7 @@ credits a minute and 200 a day. When a call returns HTTP 429, wait for the `Retr
 and don't retry straight away.
 
 Client configuration examples for Claude Code, Claude Desktop, Cursor and others are in the
-[repository README](https://github.com/GladeOutdoors/glade-agent-api#readme).
+[repository README](https://github.com/GladeOutdoors/glade-outdoors-mcp#readme).
 
 Data attribution: contains OS data © Crown copyright and database right; © OpenStreetMap
 contributors (ODbL); Forestry Commission, Natural England, NatureScot, Historic England and Cadw
