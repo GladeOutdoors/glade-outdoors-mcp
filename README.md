@@ -2,7 +2,7 @@
 
 Find woodland, nature reserves, parks, green and outdoor spaces across the UK — built for AI agents.
 
-Glade indexes 443,000+ named destinations across England, Scotland, and Wales — woodlands, parks, nature reserves, historic sites, and more — and exposes them through a [Model Context Protocol](https://modelcontextprotocol.io) server and a REST API. Ask it what's near a postcode, filter by activity, and get back structured location data including trails, facilities, and upcoming events.
+Glade indexes 443,000+ named destinations across England, Scotland, and Wales — woodlands, parks, nature reserves, historic sites, and more — and exposes them through a [Model Context Protocol](https://modelcontextprotocol.io) server. Ask it what's near a postcode, filter by activity, and get back structured location data including trails, facilities, and upcoming events.
 
 **Endpoint:** `https://getglade.co.uk/api/mcp`  
 **Transport:** Streamable HTTP (JSON-RPC 2.0)  
@@ -326,125 +326,6 @@ Broad classifications where a more specific type is not available.
 
 ---
 
-## REST API
-
-The same data is available over a conventional REST API if you prefer that over MCP.
-
-Authenticate with an `Authorization: Bearer glade_YOUR_KEY` header, or pay per-call using [x402 USDC payments](#x402-payments).
-
-### Search
-
-```
-GET https://getglade.co.uk/api/v1/locations/search
-```
-
-Query parameters match `search_locations` tool arguments:
-
-| Parameter | Type | Description |
-|---|---|---|
-| `place` | string | UK place name (preferred for city/town searches) |
-| `postcode` | string | UK postcode |
-| `lat` | number | Decimal latitude |
-| `lng` | number | Decimal longitude |
-| `activity` | string | Activity slug |
-| `location_types` | string | Location type(s) — repeat param or comma-separated |
-| `facilities` | string | Required facility(s) — repeat param or comma-separated |
-| `radius_km` | number | Search radius in km (default 20, max 50) |
-| `limit` | integer | Number of results (default 10, max 25) |
-
-**Examples:**
-
-```bash
-# Search by postcode
-curl "https://getglade.co.uk/api/v1/locations/search?postcode=WA14+4SA&activity=dog-walks&limit=5" \
-  -H "Authorization: Bearer glade_YOUR_KEY"
-
-# Search by place name
-curl "https://getglade.co.uk/api/v1/locations/search?place=Manchester&activity=forest-walks" \
-  -H "Authorization: Bearer glade_YOUR_KEY"
-
-# Search with location type filter (woodland near Leeds)
-curl "https://getglade.co.uk/api/v1/locations/search?place=Leeds&location_types=broadleaved,conifer,mixed" \
-  -H "Authorization: Bearer glade_YOUR_KEY"
-
-# Search with facility filter (park with cafe)
-curl "https://getglade.co.uk/api/v1/locations/search?place=Wakefield&location_types=urban_park,country_park&facilities=cafe" \
-  -H "Authorization: Bearer glade_YOUR_KEY"
-```
-
-**Response:**
-```json
-{
-  "locations": [...],
-  "total": 10,
-  "resolved_place": "manchester",
-  "explore_url": "/explore?lat=53.48&lng=-2.24&activity=forest-walks"
-}
-```
-
-**Note:** The phrase→filter lexicon (e.g. "woodlands" → `forest-walks` activity only) is **chat-only**. API callers should send structured `activity`, `location_types`, and `facilities` parameters directly. "Near me" geolocation is also chat-only — API callers should pass explicit `lat`/`lng` coordinates.
-
-### Detail
-
-```
-GET https://getglade.co.uk/api/v1/locations/:id
-```
-
-```bash
-curl "https://getglade.co.uk/api/v1/locations/e18cd089-a994-4d96-b5e8-989bebe599af" \
-  -H "Authorization: Bearer glade_YOUR_KEY"
-```
-
----
-
-## x402 payments
-
-REST endpoints support [x402](https://x402.org) — a standard for per-call USDC payments on Base. No API key or account required. x402-compatible agents receive a `402 Payment Required` response, pay automatically, and retry.
-
-| Endpoint | Cost |
-|---|---|
-| `GET /api/v1/locations/search` | $0.0010 USDC (1 credit) |
-| `GET /api/v1/locations/:id` | $0.0030 USDC (3 credits) |
-
-**Flow:**
-
-```bash
-# 1 — request without auth returns 402 with payment instructions
-curl -s https://getglade.co.uk/api/v1/locations/search?postcode=WA14+4SA
-# → HTTP 402  { "x402Version": 1, "accepts": [...payment requirements...] }
-
-# 2 — x402 client pays and retries with signed X-PAYMENT header
-# (handled automatically by x402-compatible agents and SDKs)
-```
-
-**TypeScript / Node:**
-
-```typescript
-import { wrapFetchWithPayment } from 'x402-fetch';
-import { createWalletClient, http } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { base } from 'viem/chains';
-
-const account = privateKeyToAccount(process.env.PRIVATE_KEY);
-const walletClient = createWalletClient({ account, chain: base, transport: http() });
-
-// Wraps fetch — handles 402 → pay → retry automatically
-const fetch402 = wrapFetchWithPayment(fetch, walletClient);
-
-const res = await fetch402(
-  'https://getglade.co.uk/api/v1/locations/search?postcode=WA14+4SA'
-);
-const { locations } = await res.json();
-```
-
-```
-npm install x402-fetch viem
-```
-
-Payments settle on Base mainnet. For testing use `base-sepolia` (configured server-side).
-
----
-
 ## Coverage
 
 Glade covers England, Scotland, and Wales. Location data is sourced from Ordnance Survey Open Data, OpenStreetMap, Natural England, and NatureScot, and is updated continuously.
@@ -485,12 +366,19 @@ Glade covers England, Scotland, and Wales. Location data is sourced from Ordnanc
 | HTTP status | Meaning |
 |---|---|
 | `401` | Missing or invalid API key |
-| `400` | Invalid parameters (bad postcode format, lat/lng out of UK bounds) |
-| `404` | Location not found |
-| `429` | Rate limit exceeded — check `Retry-After` header |
-| `500` | Internal error |
+| `400` | Request body isn't valid JSON |
+| `429` | Rate limit exceeded — check the `Retry-After` header |
 
-MCP JSON-RPC errors use standard codes: `-32601` method not found, `-32603` internal error.
+Tool and protocol errors come back as JSON-RPC errors: `-32601` unknown method or tool, `-32603` internal error (including "Location not found" from `get_location_detail`).
+
+---
+
+## Other ways to call Glade
+
+The same data is available outside MCP:
+
+- [REST API reference](https://github.com/GladeOutdoors/glade-outdoors-mcp/blob/main/docs/rest-api.md) — plain HTTPS endpoints with the same parameters as the MCP tools.
+- [x402 payments reference](https://github.com/GladeOutdoors/glade-outdoors-mcp/blob/main/docs/x402.md) — pay per call in USDC with no API key or account.
 
 ---
 
