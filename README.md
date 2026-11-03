@@ -21,7 +21,7 @@ Visit [getglade.co.uk/developers](https://getglade.co.uk/developers) and fill in
 **Claude Code (plugin — recommended)** — installs the MCP server plus the Glade [skill](#agent-skill), and prompts for your key (stored in your OS keychain):
 
 ```
-/plugin install glade --marketplace jamesmorgan/glade-agent-api
+/plugin install glade --marketplace GladeOutdoors/glade-agent-api
 ```
 
 **Claude Code (server only):**
@@ -71,10 +71,10 @@ claude mcp add --transport http glade https://getglade.co.uk/api/mcp \
 
 ## Agent skill
 
-[`skills/glade/SKILL.md`](https://github.com/jamesmorgan/glade-agent-api/blob/main/skills/glade/SKILL.md) teaches an agent when to reach for Glade and how to use it well: turning "woods near Leeds with a café" into the right filters, searching before fetching detail to save credits, and recovering when a place isn't found. It follows the open [Agent Skills](https://agentskills.io) format, so it works in Claude Code, Codex, Cursor, Gemini CLI and other compatible agents:
+[`skills/glade/SKILL.md`](https://github.com/GladeOutdoors/glade-agent-api/blob/main/skills/glade/SKILL.md) teaches an agent when to reach for Glade and how to use it well: turning "woods near Leeds with a café" into the right filters, searching before fetching detail to save credits, and recovering when a place isn't found. It follows the open [Agent Skills](https://agentskills.io) format, so it works in Claude Code, Codex, Cursor, Gemini CLI and other compatible agents:
 
 ```bash
-npx skills add jamesmorgan/glade-agent-api
+npx skills add GladeOutdoors/glade-agent-api
 ```
 
 The Claude Code plugin above includes it automatically.
