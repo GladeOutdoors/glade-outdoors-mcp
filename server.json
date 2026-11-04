@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.GladeOutdoors/glade",
-  "title": "Glade — UK outdoor places",
-  "description": "Find woodland, nature reserves, parks and trails across England, Scotland and Wales.",
+  "title": "Glade — UK green spaces, forests and parks",
+  "description": "Find woodland, nature reserves, green spaces, parks and trails across England, Scotland and Wales.",
   "version": "1.0.0",
   "websiteUrl": "https://getglade.co.uk/developers",
   "repository": {

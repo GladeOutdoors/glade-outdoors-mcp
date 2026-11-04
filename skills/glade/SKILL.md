@@ -3,7 +3,7 @@ name: glade
 description: Find woodland, nature reserves, parks, trails and other green or outdoor spaces in England, Scotland and Wales using the Glade MCP server. Use when the user asks where to walk, hike, cycle, swim wild, forage, take the dog or the kids, or spend a day outdoors near a UK place, postcode or coordinates — or wants facilities (parking, toilets, café), trails or events at a specific UK outdoor location. Not for places outside Great Britain, indoor venues, or live conditions such as weather or closures.
 ---
 
-# Glade — UK outdoor places
+# Glade — UK green spaces, forests and parks
 
 Glade indexes 443,000+ named outdoor destinations across England, Scotland and Wales from open
 public data (Forestry Commission NFI, Ordnance Survey, OpenStreetMap, Natural England, NatureScot,
