@@ -2,7 +2,7 @@
   "name": "glade",
   "displayName": "Glade — UK outdoor places",
   "version": "1.0.0",
-  "description": "Find woodland, nature reserves, parks and trails across England, Scotland and Wales. Bundles the Glade MCP server with a skill that teaches the agent when and how to search.",
+  "description": "Find woodland, nature reserves, green spaces, parks and walking and bike trails across England, Scotland and Wales. Bundles the Glade MCP server with a skill that teaches the agent when and how to search.",
   "author": {
     "name": "Glade",
     "email": "hello@getglade.co.uk",
@@ -16,6 +16,7 @@
     "outdoors",
     "woodland",
     "nature-reserves",
+    "green-spaces",
     "parks",
     "walking",
     "hiking",
